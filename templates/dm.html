@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+        <title>healthycable | DM</title>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+    <body>
+        <div id="wrapper">
+            <div class="controls">
+                <div class="control back" onclick="back()">&lt; back</div>
+                <div class="control loadmore" onclick="loadmore()">load more</div>
+                <div class="control refresh" onclick="refresh()">refresh</div>
+            </div>
+            <div id="messages">
+                {% for m in ctx %}
+                    {% if not loop.first %}
+                        <div class="message">
+                            <div class="head">
+                                <p class="author"><img src="https://cdn.discordapp.com/avatars/{{ m.author.id }}/{{ m.author.pfp }}" alt="pfp">{{ m.author.name }}</p>
+                                <p class="timestamp">{{ m.timestamp }}</p>
+                                <div class="replyTo" data-msg-id="{{ m.id }}" onclick="var x = '{{ m.id }}'; replyTo(x)">&lt;-</div>
+                            </div>
+                            <div class="content">
+                                {% if m.reply == 0 %}
+
+                                {% elif m.reply == 1 %}
+                                    <p class="reply">╰ <i>load more messages to view</i></p>
+                                {% else %}
+                                    <p class="reply">╰ <img src="https://cdn.discordapp.com/avatars/{{ m.reply.author.id }}/{{ m.reply.author.pfp }}" alt="pfp"><span>{{ m.reply.content|truncate(64, True) }}</span></p>
+                                {% endif %}
+                                <p class="text">{{ m.content }}</p>
+                                <div class="attachments">
+                                    {% if m.attachments != 0 %}
+                                        {% for a in m.attachments %}
+                                            <img src="{{ a.url }}&width=150&height=150" alt="img" onclick="var x = '{{ a.url }}'; openImage(x)">
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="inputs">
+                <textarea id="textinput"></textarea>
+                <input type="button" id="send" value="->" onclick="send()">
+            </div>
+        </div>
+        <div id="bigimg-wrapper" onclick="closeImage()">
+            <img id="bigimg" src="" alt="">
+        </div>
+        <script>
+            document.body.scrollTop = 90000;
+            fixTimestamps();
+            
+            const wrapper = document.getElementById("wrapper");
+            const bigimg = document.getElementById("bigimg");
+            const viewport = document.getElementById("viewport");
+            const textfield = document.getElementById("textinput");
+            const channel_id = "{{ ctx[0] }}";
+            var xhr = new XMLHttpRequest();
+            replying = {
+                is: false,
+                msg_id: 0
+            };
+
+            function openImage(url) {
+                wrapper.style.display = "none";
+                bigimg.style.display = "initial";
+                bigimg.src = url;
+                viewport.setAttribute("content", "width=device-width, initial-scale=1.0, minimum-scale=1.0");
+            }
+
+            function closeImage() {
+                wrapper.style.display = "initial";
+                bigimg.style.display = "none";
+                bigimg.src = "";
+                viewport.setAttribute("content", "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0");
+                document.body.scrollTop = 90000;
+            }
+
+            function send() {
+                xhr.open("POST", "/send");
+                xhr.addEventListener("load", sendComplete)
+                payload = {
+                    "channel_id": channel_id,
+                    "content": textfield.value
+                };
+                if (replying.is == true) {
+                    payload.reply_message_id = replying.msg_id;
+                }
+                xhr.send(JSON.stringify(payload));
+            }
+
+            function replyTo(msg_id) {
+                all_msgs = document.getElementsByClassName("message");
+                end_reply = false;
+                // alert("hi");
+
+                for (i = 0; i < all_msgs.length; i++) {
+                    if (replying.is == true && replying.msg_id == msg_id) {
+                        all_msgs[i].style.opacity = "1.0";
+                        if (all_msgs[i].children[0].children[2].dataset.msgId == msg_id) {
+                            all_msgs[i].children[0].children[2].innerText = "<-";
+                        }
+                        end_reply = true;
+                    }
+                    
+                    else {
+                        if (all_msgs[i].children[0].children[2].dataset.msgId != msg_id) {
+                            all_msgs[i].style.opacity = "0.5";
+                            all_msgs[i].children[0].children[2].innerText = "<-";
+                        }
+                        else {
+                            all_msgs[i].style.opacity = "1.0";
+                            all_msgs[i].children[0].children[2].innerText = "x";
+                        }
+                    }
+                }
+
+                if (end_reply == true) {
+                    replying.is = false;
+                    replying.msg_id = 0;
+                }
+                else {
+                    replying.is = true;
+                    replying.msg_id = msg_id;
+                }
+            }
+
+            function sendComplete() {
+                if (xhr.status == 200) {
+                    window.location.reload();
+                }
+                else {
+                    alert(xhr.status);
+                }
+            }
+
+            function padZerosDateTime(datetime) {
+                dt = String(datetime);
+                if (dt.length == 1) {dt = "0" + dt;}
+                return dt;
+            }
+
+            function fixTimestamps() {                
+                timestamps = document.getElementsByClassName("timestamp");
+                for (i = 0; i < timestamps.length; i++) {
+                    raw_ts = timestamps[i].innerText;
+                    datetime = new Date(raw_ts);
+                    now = new Date();
+
+                    hours = datetime.getHours();
+                    minutes = padZerosDateTime(datetime.getMinutes());
+                    date = padZerosDateTime(datetime.getDate());
+                    month = padZerosDateTime(datetime.getMonth() + 1);
+                    year = datetime.getYear() - 100;
+
+                    if ((now - datetime) / 36e5 >= 24) {
+                        timestamps[i].innerText = date + "." + month + "." + year + ", " + hours + ":" + minutes;
+                    }
+                    else {
+                        timestamps[i].innerText = hours + ":" + minutes;
+                    }
+                }
+            }
+
+            function back() {
+                window.location.href = window.location.origin + "/dms";
+            }
+
+            function loadmore() {
+                lio_limit = window.location.href.lastIndexOf("?limit=");
+                if (lio_limit == -1) {
+                    limit = 10
+                }
+                else {
+                    limit = Number(window.location.href.substring(lio_limit + 7));
+                }
+                
+                pure_url = window.location.href.substring(0, window.location.href.lastIndexOf("?limit="));
+                window.location.href = pure_url + "?limit=" + (limit + 10);
+            }
+
+            function refresh() {
+                window.location.href = window.location.origin + "/dms/" + channel_id;
+            }
+        </script>
+    </body>
+</html>

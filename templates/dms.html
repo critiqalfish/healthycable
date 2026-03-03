@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minumum-scale=1.0, maximum-scale=1.0">
+        <title>healthycable | DMs</title>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+    <body>
+        {% for c in ctx %}
+            <div class="dm-channel" onclick="window.location.href = '/dms/{{ c.id }}'">
+                {% for r in c.recipients %}
+                    <img src="https://cdn.discordapp.com/avatars/{{ r.id }}/{{ r.pfp }}" alt="pfp">
+                {% endfor %}
+                {% for r in c.recipients %}
+                    <p>{{ r.name }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </body>
+</html>
