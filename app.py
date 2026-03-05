@@ -3,9 +3,13 @@ from starlette.routing import Route, Mount
 from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 from starlette.responses import Response
+from dotenv import load_dotenv
 import requests
+import os
 
-TOKEN = ""
+load_dotenv(".env")
+
+TOKEN = os.getenv("TOKEN")
 BASE = "https://discord.com/api/v9/"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
