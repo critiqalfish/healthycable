@@ -17,6 +17,88 @@ body {
     overflow-y: scroll;
 }
 
+#error {
+    font-size: 10vh;
+    width: 100vw;
+    text-align: center;
+    margin-top: 40vh;
+}
+
+#error span {
+    color: #bd006b;
+}
+
+.wrap {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    width: 100vw;
+    height: 100vh;
+    padding: 5vh 0;
+}
+
+#title {
+    font-size: 10vh;
+    width: 100vw;
+    text-align: center;
+}
+
+#title span {
+    color: #bd006b;
+}
+
+#dms {
+    display: -webkit-box;
+    -webkit-box-align: center;
+    width: 20vw;
+    height: 12vh;
+    background-color: #303030;
+    border: 3px solid #505050;
+    border-radius: 8px;
+    font-size: 4vh;
+    margin: 20vh auto 0 auto;
+}
+
+#dms p {
+    width: 20vw;
+    text-align: center;
+}
+
+#secret {
+    display: -webkit-flex;
+    -webkit-box-orient: vertical;
+    width: 61vw;
+    background-color: #202020;
+    margin: 25vh auto 0 auto;
+}
+
+#secret #field {
+    height: 10vh;
+    width: 50vw;
+    border: none;
+    background-color: #303030;
+    border-radius: 8px;
+    outline: none;
+    color: #ffffff;
+    font-size: 4vh;
+    padding: 0.5vh 0.5vw;
+}
+
+#secret #field:focus {
+    border: 3px solid #505050;
+}
+
+#secret #confirm {
+    height: 10vh;
+    width: 10vw;
+    margin-left: auto;
+    border: 3px solid #e10080;
+    background-color: #bd006b;
+    border-radius: 8px;
+    font-size: 4vh;
+    font-weight: 900;
+    color: #ff9dd4;
+}
+
 .dm-channel {
     display: -webkit-flex;
     -webkit-box-orient: vertical;

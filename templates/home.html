@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minumum-scale=1.0, maximum-scale=1.0">
+        <title>healthycable</title>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+    <body>
+        <div class="wrap">
+            <p id="title"><span>healthy</span>cable</p>
+            <div id="dms" onclick="window.location.href = '/dms/'"><p>DMs</p></div>
+            <div id="secret">
+                <input type="password" placeholder="secret" id="field">
+                <input type="button" value="ok" id="confirm" onclick="storeSecret()">
+            </div>
+        </div>
+        <script>
+            const secretInput = document.getElementById("field");
+
+            secretInput.value = window.localStorage.getItem("secret");
+
+            function storeSecret() {
+                document.cookie = "secret=" + secretInput.value + "; SameSite=Lax; max-age=31536000;"
+                window.localStorage.setItem("secret", secretInput.value);
+                alert("stored secret");
+            }
+        </script>
+    </body>
+</html>

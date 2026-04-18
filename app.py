@@ -9,6 +9,7 @@ import os
 
 load_dotenv(".env")
 
+SECRET = os.getenv("SECRET")
 TOKEN = os.getenv("TOKEN")
 BASE = "https://discord.com/api/v9/"
 HEADERS = {
@@ -29,9 +30,12 @@ session.headers = HEADERS
 templates = Jinja2Templates(directory="templates")
 
 async def home(request):
-    return templates.TemplateResponse(request, "index.html")
+    return templates.TemplateResponse(request, "home.html")
 
 async def dms(request):
+    if request.cookies.get("secret") != SECRET:
+        return templates.TemplateResponse(request, "error.html", context={"code": 401})
+
     req = session.get(BASE + "users/@me/channels")
 
     sorted_dms = sorted(req.json(), key=lambda u: (u["last_message_id"] is not None, int(u["last_message_id"]) if u["last_message_id"] is not None else u["last_message_id"]), reverse=True)
@@ -57,6 +61,9 @@ async def dms(request):
     return templates.TemplateResponse(request, "dms.html", context={"ctx": ctx})
 
 async def dm(request):
+    if request.cookies.get("secret") != SECRET:
+        return templates.TemplateResponse(request, "error.html", context={"code": 401})
+
     limit = 10
     if "limit" in request.query_params:
         limit = request.query_params["limit"]
@@ -112,6 +119,9 @@ async def dm(request):
     return templates.TemplateResponse(request, "dm.html", context={"ctx": ctx})
 
 async def send(request):
+    if request.cookies.get("secret") != SECRET:
+        return templates.TemplateResponse(request, "error.html", context={"code": 401})
+
     body = await request.json()
     payload = {
         "content": body["content"]
