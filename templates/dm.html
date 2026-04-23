@@ -30,7 +30,9 @@
                                 {% else %}
                                     <p class="reply">╰ <img src="https://cdn.discordapp.com/avatars/{{ m.reply.author.id }}/{{ m.reply.author.pfp }}" alt="pfp"><span>{{ m.reply.content|truncate(64, True) }}</span></p>
                                 {% endif %}
-                                <p class="text">{{ m.content }}</p>
+                                {% for line in m.content.splitlines() %}
+                                    <p class="text">{{ line }}</p>
+                                {% endfor %}
                                 <div class="attachments">
                                     {% if m.attachments != 0 %}
                                         {% for a in m.attachments %}
@@ -97,7 +99,6 @@
             function replyTo(msg_id) {
                 all_msgs = document.getElementsByClassName("message");
                 end_reply = false;
-                // alert("hi");
 
                 for (i = 0; i < all_msgs.length; i++) {
                     if (replying.is == true && replying.msg_id == msg_id) {

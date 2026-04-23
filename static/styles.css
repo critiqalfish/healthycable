@@ -199,6 +199,10 @@ body {
     margin-top: 0.5vh;
 }
 
+.message .content {
+    width: 100%;
+}
+
 .message .content .reply {
     margin-bottom: 1vh;
 }
@@ -218,7 +222,10 @@ body {
 }
 
 .message .content .text {
+    width: 100%;
     font-size: 4vh;
+    text-wrap: wrap;
+    word-wrap: break-word;
 }
 
 .message .content .attachments img {

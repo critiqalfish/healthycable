@@ -5,11 +5,16 @@ from starlette.staticfiles import StaticFiles
 from starlette.responses import Response
 from dotenv import load_dotenv
 import requests
+import signal
+import sys
 import os
 
 load_dotenv(".env")
 
 SECRET = os.getenv("SECRET")
+if not SECRET:
+    os.kill(os.getppid(), signal.SIGTERM)
+    sys.exit("NO SECRET SET!")
 TOKEN = os.getenv("TOKEN")
 BASE = "https://discord.com/api/v9/"
 HEADERS = {
@@ -34,7 +39,7 @@ async def home(request):
 
 async def dms(request):
     if request.cookies.get("secret") != SECRET:
-        return templates.TemplateResponse(request, "error.html", context={"code": 401})
+        return templates.TemplateResponse(request, "error.html", context={"code": 401}, status_code=401)
 
     req = session.get(BASE + "users/@me/channels")
 
@@ -62,7 +67,7 @@ async def dms(request):
 
 async def dm(request):
     if request.cookies.get("secret") != SECRET:
-        return templates.TemplateResponse(request, "error.html", context={"code": 401})
+        return templates.TemplateResponse(request, "error.html", context={"code": 401}, status_code=401)
 
     limit = 10
     if "limit" in request.query_params:
@@ -120,7 +125,7 @@ async def dm(request):
 
 async def send(request):
     if request.cookies.get("secret") != SECRET:
-        return templates.TemplateResponse(request, "error.html", context={"code": 401})
+        return templates.TemplateResponse(request, "error.html", context={"code": 401}, status_code=401)
 
     body = await request.json()
     payload = {
@@ -148,4 +153,4 @@ routes = [
     Mount("/static", StaticFiles(directory="static"), name="static")
 ]
 
-app = Starlette(debug=True, routes=routes)
+app = Starlette(routes=routes)

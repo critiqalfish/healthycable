@@ -18,11 +18,10 @@
         <script>
             const secretInput = document.getElementById("field");
 
-            secretInput.value = window.localStorage.getItem("secret");
+            secretInput.value = document.cookie.split("=")[1];
 
             function storeSecret() {
-                document.cookie = "secret=" + secretInput.value + "; SameSite=Lax; max-age=31536000;"
-                window.localStorage.setItem("secret", secretInput.value);
+                document.cookie = "secret=" + secretInput.value + "; SameSite=Strict; max-age=31536000; Secure=true;"
                 alert("stored secret");
             }
         </script>
